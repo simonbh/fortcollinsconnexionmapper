@@ -19,8 +19,9 @@ from requests.models import encode_multipart_formdata
 # Variables
 fCGovLookupAddress='https://www.fcgov.com/connexion/address-service.php?address='
 LarimerCountyNeighboorhoodLookupAddress='https://apps.larimer.org/api/assessor/property/?prop=property&parcel=undefined&scheduleNumber=undefined&serialIdentification=undefined&name=undefined&fromAddrNum=undefined&toAddrNum=undefined&address=undefined&city=Any&subdivisionNumber=undefined&sales=any&subdivisionName='
-# Your neighboorhoor name needs to be URL encoded
-NeighboorhoodName='GOLDEN%20MEADOWS'
+# Your neighboorhoor name needs to be URL encoded, example below
+#NeighboorhoodName='GOLDEN%20MEADOWS'
+NeighboorhoodName=''
 headers={
         "Host": "www.fcgov.com", \
         "Sec-Ch-Ua": '\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"93\"', \
@@ -43,14 +44,10 @@ TodayDateTime=datetime.datetime.now().isoformat()
 ResultsDict = {}
 
 # Debug values - Normally not used
-breaker = 0
-breakValue = 6
-
-# CURL command to get JSON object based on neighborhood name
-# curl -x 'GET' 'https://apps.larimer.org/api/assessor/property/?prop=property&parcel=undefined&scheduleNumber=undefined&serialIdentification=undefined&name=undefined&fromAddrNum=undefined&toAddrNum=undefined&address=undefined&city=Any&subdivisionNumber=undefined&sales=any&subdivisionName=GOLDEN%20MEADOWS'
+#breaker = 0
+#breakValue = 6
 
 r = requests.get(LarimerCountyNeighboorhoodLookupAddress + NeighboorhoodName)
-
 neighborhoodRecords=json.loads(r.text)
 
 # Prepare CSV file to store results for mapping
@@ -69,12 +66,14 @@ with open(filename, 'w', newline='') as csvfile:
             formatted_address=urllib.parse.quote(raw_address)
             
             url = 'https://www.fcgov.com/connexion/address-service.php?address=%s' % formatted_address
+            # The fcgov endpoint will not return values if you don't send headers.  I didn't investigate to determine which headers matter and 
+            # which do not.
             r = requests.get(url, headers=headers)
     
             # As to not hammer the API endpoint
-            #time.sleep(1)
+            time.sleep(1)
             raw_response=r.text
-            print(raw_address)
+            #print(raw_address)
             # The response is a JSON object.  We must load that for further processing
             json_response=json.loads(raw_response)
             # I want to print the final results that are sorted by street name versus house number, 
