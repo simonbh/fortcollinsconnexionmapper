@@ -1,7 +1,8 @@
 # Project files
 .mapbox_token
 .gmaps_key
-results*.csv
+address_data.db
+map.html
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
